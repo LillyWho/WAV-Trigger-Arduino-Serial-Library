@@ -78,29 +78,45 @@
 #define SOM1	0xf0
 #define SOM2	0xaa
 #define EOM		0x55
-
-
-#ifdef __WT_USE_ALTSOFTSERIAL__
-#include "../AltSoftSerial/AltSoftSerial.h"
+// ==================================================================
+#ifdef ARDUINO_ARCH_ESP32
+	#ifdef __WT_USE_SERIAL1__
+		#define WTSerial Serial
+		#define __WT_SERIAL_ASSIGNED__
+	#endif
+	#ifdef __WT_USE_SERIAL2__
+		#define WTSerial Serial1
+		#define __WT_SERIAL_ASSIGNED__
+	#endif
+	#ifdef __WT_USE_SERIAL3__
+		#define WTSerial Serial2
+	#define __WT_SERIAL_ASSIGNED__
+	#endif
+	#if !defined(__WT_USE_SERIAL1__) && !defined(__WT_USE_SERIAL2__) && !defined(__WT_USE_SERIAL3__)
+  		#error "You must define one of __WT_USE_SERIAL1__, __WT_USE_SERIAL2__, or __WT_USE_SERIAL3__ in your sketch BEFORE including this library!! EXITING!!!"
+	#endif
 #else
-#include <HardwareSerial.h>
-#ifdef __WT_USE_SERIAL1__
-#define WTSerial Serial1
-#define __WT_SERIAL_ASSIGNED__
+	#ifdef __WT_USE_ALTSOFTSERIAL__
+		#include "../AltSoftSerial/AltSoftSerial.h"
+	#else
+		#include <HardwareSerial.h>
+		#ifdef __WT_USE_SERIAL1__
+			#define WTSerial Serial1
+		#define __WT_SERIAL_ASSIGNED__
+		#endif
+		#ifdef __WT_USE_SERIAL2__
+			#define WTSerial Serial2
+		#define __WT_SERIAL_ASSIGNED__
+		#endif
+		#ifdef __WT_USE_SERIAL3__
+			#define WTSerial Serial3
+			#define __WT_SERIAL_ASSIGNED__
+		#endif
+		#ifndef __WT_SERIAL_ASSIGNED__
+			#define WTSerial Serial
+		#endif
+	#endif
 #endif
-#ifdef __WT_USE_SERIAL2__
-#define WTSerial Serial2
-#define __WT_SERIAL_ASSIGNED__
-#endif
-#ifdef __WT_USE_SERIAL3__
-#define WTSerial Serial3
-#define __WT_SERIAL_ASSIGNED__
-#endif
-#ifndef __WT_SERIAL_ASSIGNED__
-#define WTSerial Serial
-#endif
-#endif
-
 class wavTrigger
 {
 public:
