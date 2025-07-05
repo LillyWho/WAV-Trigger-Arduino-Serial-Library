@@ -85,10 +85,12 @@
 		#define __WT_SERIAL_ASSIGNED__
 	#endif
 	#ifdef __WT_USE_SERIAL2__
+		HardwareSerial Serial1(1)
 		#define WTSerial Serial1
 		#define __WT_SERIAL_ASSIGNED__
 	#endif
 	#ifdef __WT_USE_SERIAL3__
+		HardwareSerial Serial2(2)
 		#define WTSerial Serial2
 	#define __WT_SERIAL_ASSIGNED__
 	#endif
