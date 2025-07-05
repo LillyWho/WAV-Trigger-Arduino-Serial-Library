@@ -38,7 +38,7 @@
 //#define __WT_USE_SERIAL1__
 //#define __WT_USE_SERIAL2__
 //#define __WT_USE_SERIAL3__
-#if !defined(__WT_USE_SERIAL1__) || !defined(__WT_USE_SERIAL2__) || !defined(__WT_USE_SERIAL3__)
+#if !defined(__WT_USE_SERIAL1__) || !defined(__WT_USE_SERIAL2__) || !defined(__WT_USE_SERIAL3__) || !defined(ARDUINO_ARCH_ESP32)
 #define __WT_USE_ALTSOFTSERIAL__
 #endif
 // ==================================================================
