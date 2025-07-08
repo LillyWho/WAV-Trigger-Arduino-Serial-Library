@@ -37,137 +37,161 @@
 
 //#define __WT_USE_SERIAL1__
 //#define __WT_USE_SERIAL2__
-//#define __WT_USE_SERIAL3__
-#if !defined(__WT_USE_SERIAL1__) || !defined(__WT_USE_SERIAL2__) || !defined(__WT_USE_SERIAL3__) || !defined(ARDUINO_ARCH_ESP32)
+#define __WT_USE_SERIAL3__
+#if !defined(__WT_USE_SERIAL1__) && !defined(__WT_USE_SERIAL2__) &&            \
+    !defined(__WT_USE_SERIAL3__) && !defined(ARDUINO_ARCH_ESP32)
 #define __WT_USE_ALTSOFTSERIAL__
 #endif
 // ==================================================================
-
-#define CMD_GET_VERSION					1
-#define CMD_GET_SYS_INFO				2
-#define CMD_TRACK_CONTROL				3
-#define CMD_STOP_ALL					4
-#define CMD_MASTER_VOLUME				5
-#define CMD_TRACK_VOLUME				8
-#define CMD_AMP_POWER					9
-#define CMD_TRACK_FADE					10
-#define CMD_RESUME_ALL_SYNC				11
-#define CMD_SAMPLERATE_OFFSET			12
-#define	CMD_TRACK_CONTROL_EX			13
-#define	CMD_SET_REPORTING				14
-#define CMD_SET_TRIGGER_BANK			15
-
-#define TRK_PLAY_SOLO					0
-#define TRK_PLAY_POLY					1
-#define TRK_PAUSE						2
-#define TRK_RESUME						3
-#define TRK_STOP						4
-#define TRK_LOOP_ON						5
-#define TRK_LOOP_OFF					6
-#define TRK_LOAD						7
-
-#define	RSP_VERSION_STRING				129
-#define	RSP_SYSTEM_INFO					130
-#define	RSP_STATUS						131
-#define	RSP_TRACK_REPORT				132
-
-#define MAX_MESSAGE_LEN					32
-#define MAX_NUM_VOICES					14
-#define VERSION_STRING_LEN				21
-
-#define SOM1	0xf0
-#define SOM2	0xaa
-#define EOM		0x55
-// ==================================================================
+// This needs to be included if on ARDUINO_ARCH_ESP32
 #ifdef ARDUINO_ARCH_ESP32
-	#ifdef __WT_USE_SERIAL1__
-		#define WTSerial Serial
-		#define __WT_SERIAL_ASSIGNED__
-	#endif
-	#ifdef __WT_USE_SERIAL2__
-		HardwareSerial Serial1(1)
-		#define WTSerial Serial1
-		#define __WT_SERIAL_ASSIGNED__
-	#endif
-	#ifdef __WT_USE_SERIAL3__
-		HardwareSerial Serial2(2)
-		#define WTSerial Serial2
-	#define __WT_SERIAL_ASSIGNED__
-	#endif
-	#if !defined(__WT_USE_SERIAL1__) && !defined(__WT_USE_SERIAL2__) && !defined(__WT_USE_SERIAL3__)
-  		#error "You must define one of __WT_USE_SERIAL1__, __WT_USE_SERIAL2__, or __WT_USE_SERIAL3__ in your sketch BEFORE including this library!! EXITING!!!"
-	#endif
-#else
-	#ifdef __WT_USE_ALTSOFTSERIAL__
-		#include "../AltSoftSerial/AltSoftSerial.h"
-	#else
-		#include <HardwareSerial.h>
-		#ifdef __WT_USE_SERIAL1__
-			#define WTSerial Serial1
-		#define __WT_SERIAL_ASSIGNED__
-		#endif
-		#ifdef __WT_USE_SERIAL2__
-			#define WTSerial Serial2
-		#define __WT_SERIAL_ASSIGNED__
-		#endif
-		#ifdef __WT_USE_SERIAL3__
-			#define WTSerial Serial3
-			#define __WT_SERIAL_ASSIGNED__
-		#endif
-		#ifndef __WT_SERIAL_ASSIGNED__
-			#define WTSerial Serial
-		#endif
-	#endif
+#include <Arduino.h>
 #endif
-class wavTrigger
-{
+// ==================================================================
+
+#define CMD_GET_VERSION 1
+#define CMD_GET_SYS_INFO 2
+#define CMD_TRACK_CONTROL 3
+#define CMD_STOP_ALL 4
+#define CMD_MASTER_VOLUME 5
+#define CMD_TRACK_VOLUME 8
+#define CMD_AMP_POWER 9
+#define CMD_TRACK_FADE 10
+#define CMD_RESUME_ALL_SYNC 11
+#define CMD_SAMPLERATE_OFFSET 12
+#define CMD_TRACK_CONTROL_EX 13
+#define CMD_SET_REPORTING 14
+#define CMD_SET_TRIGGER_BANK 15
+
+#define TRK_PLAY_SOLO 0
+#define TRK_PLAY_POLY 1
+#define TRK_PAUSE 2
+#define TRK_RESUME 3
+#define TRK_STOP 4
+#define TRK_LOOP_ON 5
+#define TRK_LOOP_OFF 6
+#define TRK_LOAD 7
+
+#define RSP_VERSION_STRING 129
+#define RSP_SYSTEM_INFO 130
+#define RSP_STATUS 131
+#define RSP_TRACK_REPORT 132
+
+#define MAX_MESSAGE_LEN 32
+#define MAX_NUM_VOICES 14
+#define VERSION_STRING_LEN 21
+
+#define SOM1 0xf0
+#define SOM2 0xaa
+#define EOM 0x55
+// ==================================================================
+
+#ifdef __WT_USE_SERIAL1__
+#define WTSerial Serial
+#define __WT_SERIAL_ASSIGNED__
+#endif
+///////
+#ifdef __WT_USE_SERIAL2__
+HardwareSerial Serial1(1);
+#define WTSerial Serial1
+#define __WT_SERIAL_ASSIGNED__
+#endif
+///////
+#ifdef __WT_USE_SERIAL3__
+HardwareSerial Serial2(2);
+#define WTSerial Serial2
+#define __WT_SERIAL_ASSIGNED__
+#endif
+//////
+#if !defined(__WT_USE_SERIAL1__) && !defined(__WT_USE_SERIAL2__) &&            \
+    !defined(__WT_USE_SERIAL3__)
+#error                                                                         \
+    "You must define one of __WT_USE_SERIAL1__, __WT_USE_SERIAL2__, or __WT_USE_SERIAL3__ in your sketch BEFORE including this library!! EXITING!!!"
+
+#else
+#ifdef __WT_USE_ALTSOFTSERIAL__
+#include "../AltSoftSerial/AltSoftSerial.h"
+#else
+#include <HardwareSerial.h>
+#ifdef __WT_USE_SERIAL1__
+#ifdef ARDUINO_ARCH_ESP32
+#define WTSerial Serial
+#else
+#define WTSerial Serial1
+#define __WT_SERIAL_ASSIGNED__
+#endif
+#endif
+#ifdef __WT_USE_SERIAL2__
+#ifdef ARDUINO_ARCH_ESP32
+#define WTSerial Serial1
+#else
+#define WTSerial Serial2
+#define __WT_SERIAL_ASSIGNED__
+#endif
+#endif // __WT_USE_SERIAL2__
+
+#ifdef __WT_USE_SERIAL3__
+#ifdef ARDUINO_ARCH_ESP32
+#define WTSerial Serial2
+#else
+#define WTSerial Serial3
+#define __WT_SERIAL_ASSIGNED__
+#endif
+#endif // __WT_USE_SERIAL3__
+
+#ifndef __WT_SERIAL_ASSIGNED__
+#define WTSerial Serial
+#endif
+#endif // else branch for fallback serial definitions
+#endif // !__WT_USE_SERIAL1__ && !__WT_USE_SERIAL2__ && !__WT_USE_SERIAL3__
+class wavTrigger {
 public:
-	wavTrigger() {;}
-	~wavTrigger() {;}
-	void start(void);
-	void update(void);
-	void flush(void);
-	void setReporting(bool enable);
-	void setAmpPwr(bool enable);
-	bool getVersion(char *pDst, int len);
-	int getNumTracks(void);
-	bool isTrackPlaying(int trk);
-	void masterGain(int gain);
-	void stopAllTracks(void);
-	void resumeAllInSync(void);
-	void trackPlaySolo(int trk);
-	void trackPlaySolo(int trk, bool lock);
-	void trackPlayPoly(int trk);
-	void trackPlayPoly(int trk, bool lock);
-	void trackLoad(int trk);
-	void trackLoad(int trk, bool lock);
-	void trackStop(int trk);
-	void trackPause(int trk);
-	void trackResume(int trk);
-	void trackLoop(int trk, bool enable);
-	void trackGain(int trk, int gain);
-	void trackFade(int trk, int gain, int time, bool stopFlag);
-	void samplerateOffset(int offset);
-	void setTriggerBank(int bank);
+  wavTrigger() { ; }
+  ~wavTrigger() { ; }
+  void start(void);
+  void update(void);
+  void flush(void);
+  void setReporting(bool enable);
+  void setAmpPwr(bool enable);
+  bool getVersion(char *pDst, int len);
+  int getNumTracks(void);
+  bool isTrackPlaying(int trk);
+  void masterGain(int gain);
+  void stopAllTracks(void);
+  void resumeAllInSync(void);
+  void trackPlaySolo(int trk);
+  void trackPlaySolo(int trk, bool lock);
+  void trackPlayPoly(int trk);
+  void trackPlayPoly(int trk, bool lock);
+  void trackLoad(int trk);
+  void trackLoad(int trk, bool lock);
+  void trackStop(int trk);
+  void trackPause(int trk);
+  void trackResume(int trk);
+  void trackLoop(int trk, bool enable);
+  void trackGain(int trk, int gain);
+  void trackFade(int trk, int gain, int time, bool stopFlag);
+  void samplerateOffset(int offset);
+  void setTriggerBank(int bank);
 
 private:
-	void trackControl(int trk, int code);
-	void trackControl(int trk, int code, bool lock);
+  void trackControl(int trk, int code);
+  void trackControl(int trk, int code, bool lock);
 
 #ifdef __WT_USE_ALTSOFTSERIAL__
-	AltSoftSerial WTSerial;
+  AltSoftSerial WTSerial;
 #endif
 
-	uint16_t voiceTable[MAX_NUM_VOICES];
-	uint8_t rxMessage[MAX_MESSAGE_LEN];
-	char version[VERSION_STRING_LEN];
-	uint16_t numTracks;
-	uint8_t numVoices;
-	uint8_t rxCount;
-	uint8_t rxLen;
-	bool rxMsgReady;
-	bool versionRcvd;
-	bool sysinfoRcvd;
+  uint16_t voiceTable[MAX_NUM_VOICES];
+  uint8_t rxMessage[MAX_MESSAGE_LEN];
+  char version[VERSION_STRING_LEN];
+  uint16_t numTracks;
+  uint8_t numVoices;
+  uint8_t rxCount;
+  uint8_t rxLen;
+  bool rxMsgReady;
+  bool versionRcvd;
+  bool sysinfoRcvd;
 };
 
 #endif
